@@ -1,0 +1,460 @@
+{
+	"info": {
+		"_postman_id": "f69a15c2-3300-473e-9dd4-195612c7c146",
+		"name": "Blog API Endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15322675"
+	},
+	"item": [
+		{
+			"name": "Register a new user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('It should register a new user with valid data', function() {\r",
+							"    pm.response.to.have.status(201)\r",
+							"    \r",
+							"    const user = pm.response.json()\r",
+							"    pm.expect(user).to.be.not.null\r",
+							"    pm.expect(user._id).to.be.a('string')\r",
+							"    pm.collectionVariables.set('userId', user._id)\r",
+							"})\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Quando Usar CONST ou VAR:\r",
+							"//CONST>> Você tem um valor que não deve mudar durante a execução do script. \r",
+							"//Isso torna seu código mais previsível e seguro, pois evita alterações acidentais.\r",
+							"//É a prática mais recomendada para o desenvolvimento JavaScript moderno. \r",
+							"//VAR>>\r",
+							"//Você estiver trabalhando com código JavaScript mais antigo (legado).\r",
+							"//No desenvolvimento moderno, seu uso é desencorajado devido ao seu escopo mais amplo, que pode levar a erros. \r",
+							"//No Postman, a melhor prática é usar const por padrão e recorrer a let (que também é de escopo de bloco, mas permite reatribuição)\r",
+							"//apenas quando a variável precisar ser alterada. \r",
+							"\r",
+							"// Example: Generating a random first name and setting it as an collection variable\r",
+							"    var randomFirstName = pm.variables.replaceIn(\"{{$randomFirstName}}\");\r",
+							"    pm.collectionVariables.set(\"firstName\", randomFirstName);\r",
+							"\r",
+							"// Example: Generating a random email address and setting it as a collection variable\r",
+							"    var randomEmail = pm.variables.replaceIn(\"{{$randomEmail}}\");\r",
+							"    pm.collectionVariables.set(\"userEmail\", randomEmail);\r",
+							"\r",
+							"// Example: Generating a random email address with getTime and setting it as a collection variable\r",
+							"    const email = `vale.${new Date().getTime()}@email.com`\r",
+							"    pm.collectionVariables.set('userEmail2', email)\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"{{firstName}}\",\r\n  \"email\": \"{{userEmail}}\",\r\n  \"password\": \"teste\",\r\n  \"administrador\": \"true\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/usuarios",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register a user with inavalid data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('It should not register user with an invalid password', function() {\r",
+							"    pm.response.to.have.status(400)\r",
+							"    \r",
+							"    const passwordResp  = pm.response.json()\r",
+							"\r",
+							"    pm.expect(passwordResp.password ).to.equal(\"password não pode ficar em branco\");\r",
+							"    pm.expect(passwordResp.password ).to.be.have.length.greaterThan(0)\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"Fulano da Silva\",\r\n  \"email\": \"vale10@qa.com.br\",\r\n  \"password\": \"\",\r\n  \"administrador\": \"true\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/usuarios",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authenticate a user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const {message, authorization} = pm.response.json()\r",
+							"pm.collectionVariables.set('authorization', authorization)\r",
+							"\r",
+							"pm.test('It should authenticate a user with valid credentials', function() {\r",
+							"    pm.response.to.have.status(200)\r",
+							"    pm.expect(message).to.equal(\"Login realizado com sucesso\");\r",
+							"    pm.expect(authorization).to.be.have.length.greaterThan(0)\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{userEmail}}\",\r\n    \"password\": \"teste\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register a new product",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"    // Example: Generating a random email address with getTime and setting it as a collection variable\r",
+							"    const produtoNome = `Mouse-${new Date().getTime()}`\r",
+							"    pm.collectionVariables.set('mouseNome', produtoNome)"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const produto = pm.response.json()\r",
+							"pm.collectionVariables.set(\"produtoId\", produto._id)\r",
+							"\r",
+							"pm.test('It should register a new product with valid data', function() {\r",
+							"    pm.response.to.have.status(201)\r",
+							"        pm.expect(produto.message).to.be.not.null\r",
+							"    pm.expect(produto._id).to.be.have.length.greaterThan(0)\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{authorization}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"{{mouseNome}}\",\r\n  \"preco\": 470,\r\n  \"descricao\": \"Mouse\",\r\n  \"quantidade\": 381\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/produtos",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"produtos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieves a post by its id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('It should retrieve a product with valid id', function() {\r",
+							"    pm.response.to.have.status(200)\r",
+							"    const produto = pm.response.json()\r",
+							"    pm.expect(produto.nome).to.be.not.null\r",
+							"    const varProdutoId = pm.collectionVariables.get('produtoId')\r",
+							"    pm.expect(produto._id).to.equal(varProdutoId)\r",
+							"    pm.expect(produto._id).to.be.have.length.greaterThan(0)\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{authorization}}",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseUrl}}/produtos/{{produtoId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"produtos",
+						"{{produtoId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delets a product by id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('It should delete a product with valid id', function() {\r",
+							"    pm.response.to.have.status(200)\r",
+							"    \r",
+							"    const {message} = pm.response.json()\r",
+							"    pm.expect(message).to.equal(\"Registro excluído com sucesso\")\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{authorization}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/produtos/{{produtoId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"produtos",
+						"{{produtoId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delets an user by id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('It should delete an user with valid by id', function() {\r",
+							"    pm.response.to.have.status(200)\r",
+							"    const {message} = pm.response.json()\r",
+							"    pm.expect(message).to.equal(\"Registro excluído com sucesso\")\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{authorization}}",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/usuarios/{{userId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"usuarios",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://serverest.dev",
+			"description": "url base"
+		},
+		{
+			"key": "userEmail",
+			"value": ""
+		},
+		{
+			"key": "firstName",
+			"value": ""
+		},
+		{
+			"key": "userEmail2",
+			"value": ""
+		},
+		{
+			"key": "authorization",
+			"value": ""
+		},
+		{
+			"key": "mouseNome",
+			"value": ""
+		},
+		{
+			"key": "produtoId",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		}
+	]
+}
